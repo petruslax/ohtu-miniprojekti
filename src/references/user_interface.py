@@ -1,3 +1,5 @@
+from database import init_db
+
 def add_information():
     """Kysy käyttäjältä mitä lisätään."""
     information = input("Anna lisättävä tieto: ")
@@ -13,6 +15,8 @@ def add_information():
 
 
 def start():
+    init_db()
+
     """Käynnistetään komentorivi-näkymä."""
     print("tervetuloa testiohjelmaan")
     add_information()
