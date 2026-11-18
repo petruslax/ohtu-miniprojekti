@@ -27,3 +27,6 @@ Täydennetään...
 ## Lisenssi
 
 Täydennetään...
+
+## suorittaminen
+komentoriville, pythonilla
