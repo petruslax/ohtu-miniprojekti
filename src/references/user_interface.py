@@ -1,7 +1,15 @@
 def add_information():
     """Kysy käyttäjältä mitä lisätään."""
     information = input("Anna lisättävä tieto: ")
-    print(f"Annettu tieto: {information}")
+    print("\nLisää uusi tieto")
+    print("----------------")
+
+    title = input("Otsikko: ")
+    description = input("testi: ")
+
+    print("\nAnnetut tiedot:")
+    print(f"Otsikko: {title}")
+    print(f"testi: {description}")
 
 
 def start():
