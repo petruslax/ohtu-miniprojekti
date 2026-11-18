@@ -17,8 +17,7 @@ Ominaisuudet tarkentuvat asiakkaan kanssa.
 - CI (GitHub Actions): Linkki lisätään
 
 ## Definition of Done
-
-Täydennetään...
+Kyetään luomaan lomake, johon pystytään luomaan ainakin yksi lähdeviite hakemus, talenttaa se ja tulostaa.
 
 ## Asennus ja käyttö
 
