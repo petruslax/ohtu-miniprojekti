@@ -1,3 +1,4 @@
+import sqlite3
 
 from database import (
     init_db,
@@ -13,8 +14,12 @@ def add_information():
     print("\nLisää uusi lähde")
     print("----------------")
 
-    title = input("Otsikko: ")
-    author = input("Tekijä: ")
+    title = input("Otsikko: ").strip()
+    author = input("Tekijä: ").strip()
+
+    if not title or not author:
+        print("Otsikko ja tekijä eivät saa olla tyhjiä.")
+        return
 
     try:
         year = int(input("Julkaisuvuosi: "))
@@ -22,7 +27,11 @@ def add_information():
         print("Virheellinen vuosiluku!")
         return
 
-    add_reference(title, author, year)
+    try:
+        add_reference(title, author, year)
+    except sqlite3.Error:
+        print("Lähteen tallennus epäonnistui.")
+        return
 
     print("\nLähde tallennettu!")
 

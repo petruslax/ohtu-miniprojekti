@@ -2,6 +2,7 @@ import os
 import sys
 import tempfile
 import unittest
+import sqlite3
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
@@ -100,17 +101,42 @@ class TestLahteidenHallinta(unittest.TestCase):
             tuloste.getvalue()
         )
 
-    def test_virheellinen_poisto_id_ei_poista_lahdetta(self):
-        database.add_reference("Ohjelmistotuotanto", "Matti Meikäläinen", 2024)
-
-        with patch("builtins.input", return_value="ei numero"):
+    def test_tyhja_otsikko_ei_tallenna_lahdetta(self):
+        with patch(
+            "builtins.input",
+            side_effect=["", "Matti Meikäläinen", "2024"]
+        ):
             with redirect_stdout(StringIO()):
-                user_interface.remove_information()
+                user_interface.add_information()
 
-        lahteet = database.get_references()
+        self.assertEqual(database.get_references(), [])
 
-        self.assertEqual(len(lahteet), 1)
-        self.assertEqual(
-            lahteet[0][1:],
-            ("Ohjelmistotuotanto", "Matti Meikäläinen", 2024)
+    def test_tyhja_tekija_ei_tallenna_lahdetta(self):
+        with patch(
+            "builtins.input",
+            side_effect=["Ohjelmistotuotanto", "", "2024"]
+        ):
+            with redirect_stdout(StringIO()):
+                user_interface.add_information()
+
+        self.assertEqual(database.get_references(), [])
+
+    def test_tietokantavirheesta_naytetaan_virheviesti(self):
+        tuloste = StringIO()
+
+        with patch(
+            "builtins.input",
+            side_effect=["Ohjelmistotuotanto", "Matti Meikäläinen", "2024"]
+        ):
+            with patch(
+                "user_interface.add_reference",
+                side_effect=sqlite3.OperationalError("tietokanta ei käytettävissä")
+            ):
+                with redirect_stdout(tuloste):
+                    user_interface.add_information()
+
+        self.assertIn(
+            "Lähteen tallennus epäonnistui.",
+            tuloste.getvalue()
         )
+        self.assertNotIn("Lähde tallennettu!", tuloste.getvalue())
