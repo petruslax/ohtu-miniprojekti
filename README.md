@@ -13,7 +13,7 @@ Ominaisuudet tarkentuvat asiakkaan kanssa.
 ## Projektinhallinta
 
 - Product backlog: [linkki](https://docs.google.com/spreadsheets/d/1pdlh-rOde1VTG8ahHbtjvErIwi0Nk5cS1Zb83f1axf8/edit?gid=0#gid=0)
-- Sprint backlog: Linkki lisätään
+- Sprint backlog: [linkki](https://docs.google.com/spreadsheets/d/1pdlh-rOde1VTG8ahHbtjvErIwi0Nk5cS1Zb83f1axf8/edit?gid=1222218005#gid=1222218005)
 - CI (GitHub Actions): Linkki lisätään
 
 ## Definition of Done
