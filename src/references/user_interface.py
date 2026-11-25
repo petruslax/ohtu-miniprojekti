@@ -78,6 +78,40 @@ def remove_information():
     print("Lähteen poistopyyntö suoritettu.")
 
 
+def export_information():
+
+    references = get_references()
+    
+    if not references:
+        return    
+
+    bibtex_entries = []
+
+    for reference in references:
+        reference_id, title, author, year = reference
+
+        entry = (
+              f"@misc{{AVAINTÄHÄN{reference_id},\n"
+              f"author = {{{author}}},\n"
+              f"title = {{{title}}},\n"
+              f"year = {{{year}}}\n"
+              f"}}"  
+        )
+
+        bibtex_entries.append(entry)
+
+    try:
+        with open("references.bib", "w") as f:
+            f.write("\n\n".join(bibtex_entries))
+    except OSError:
+        print("\nBibTeX-tiedoston luominen epäonnistui")
+        return
+    
+    print("\nLähteet tallennettu tiedostoon references.bib")      
+    
+
+
+
 def start():
     """Käynnistetään komentorivi-näkymä."""
 
@@ -90,7 +124,8 @@ def start():
         print("1. Lisää uusi lähde")
         print("2. Tutki tallennettuja lähteitä")
         print("3. Poista lähde")
-        print("4. Lopeta")
+        print("4. Vie tiedostoon")
+        print("5. Lopeta")
 
         choice = input("\nValitse toiminto: ")
 
@@ -104,6 +139,9 @@ def start():
             remove_information()
 
         elif choice == "4":
+                    export_information()    
+
+        elif choice == "5":
             print("Ohjelma suljetaan.")
             break
 
