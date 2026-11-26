@@ -1,10 +1,12 @@
 import sqlite3
+from datetime import datetime
 
 from database import (
     init_db,
     add_reference,
     get_references,
-    delete_reference
+    delete_reference,
+    edit_reference
 )
 
 
@@ -78,6 +80,75 @@ def remove_information():
     print("Lähteen poistopyyntö suoritettu.")
 
 
+def edit_information():
+    """Käyttäjä voi muokata tallennettuja lähteitä"""
+
+    show_information()
+
+    references = get_references()
+
+    if not references:
+            return
+
+    try:
+        reference_id = int(input("\nAnna muokattavan lähteen ID: "))
+    except ValueError:
+        print("Virheellinen ID!")
+        return
+
+    while True:
+        print("\nMitä haluat muokata?")
+        print("1. muokkaa otsikko")
+        print("2. muokkaa tekijä")
+        print("3. muokkaa vuosi")
+        print("4. näytä lähteet")
+        print("5. lopeta muokkaus")
+
+        edit = input("\nValitse toiminto: ")
+
+        if edit == "1":
+            newTitle = input("\nAnna uusi otsikko: ")
+            if is_it_empty(newTitle) == False:
+                edit_reference(reference_id, title=newTitle)
+            else:
+                print("\notsikko ei saa olla tyhjä")
+            
+        elif edit == "2":
+            newAuthor = input("\nAnna uusi tekijä: ")
+            if is_it_empty(newAuthor) == False:
+                edit_reference(reference_id, author=newAuthor)
+            else: 
+                print("\ntekijä ei saa olla tyhjä")
+            
+        elif edit == "3":
+            newYear = input("\nAnna uusi vuosi: ".strip())
+            if is_year(newYear) == True:
+                edit_reference(reference_id, year=newYear)
+            else: 
+                print("Virheellinen vuosi")     
+        elif edit == "4":
+            show_information()
+
+        elif edit == "5":
+            print ("Muokkaus lopetettu")
+            break
+            
+        else:
+            print("Toimintoa " + edit + " ei ole olemassa.")
+            
+def is_year(year):
+    """Tarkistaa onko syöte vuosi"""
+    clearYear = year.strip()
+    if 1000 <= int(clearYear) <= datetime.now().year:
+        return True
+    else:
+        return False
+
+def is_it_empty(word):
+    return not word.strip()
+    
+        
+
 def start():
     """Käynnistetään komentorivi-näkymä."""
 
@@ -90,7 +161,8 @@ def start():
         print("1. Lisää uusi lähde")
         print("2. Tutki tallennettuja lähteitä")
         print("3. Poista lähde")
-        print("4. Lopeta")
+        print("4. Muokkaa lähteitä")
+        print("5. Lopeta")
 
         choice = input("\nValitse toiminto: ")
 
@@ -104,6 +176,9 @@ def start():
             remove_information()
 
         elif choice == "4":
+            edit_information()
+
+        elif choice == "5":
             print("Ohjelma suljetaan.")
             break
 
