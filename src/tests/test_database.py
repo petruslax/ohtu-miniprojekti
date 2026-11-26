@@ -147,11 +147,89 @@ class TestLahteidenHallinta(unittest.TestCase):
         with redirect_stdout(StringIO()):
             user_interface.export_information()
 
-        bibtex = Path("references.bib").read_text(encoding="utf-8")
+        with open("references.bib", encoding="utf-8") as tiedosto:
+            bibtex = tiedosto.read()
 
         self.assertIn("@misc{lahde1,", bibtex)
         self.assertIn("author = {Matti Meikäläinen}", bibtex)
         self.assertIn("title = {Ohjelmistotuotanto}", bibtex)
         self.assertIn("year = {2024}", bibtex)
 
-    
+    def test_bibtex_vienti_tyhjasta_listasta_ei_luo_tiedostoa(self):
+        tuloste = StringIO()
+
+        with redirect_stdout(tuloste):
+            user_interface.export_information()
+
+        self.assertIn("Ei lähteitä vietäväksi.", tuloste.getvalue())
+        self.assertFalse(os.path.exists("references.bib"))
+
+    def test_bibtex_viennin_hylkäys(self):
+        database.add_reference("Ohjelmistotuotanto", "Matti Meikäläinen", 2024)
+        tuloste = StringIO()
+
+        with patch("builtins.open", side_effect=OSError):
+            with redirect_stdout(tuloste):
+                user_interface.export_information()
+
+        self.assertIn(
+            "BibTeX-tiedoston luominen epäonnistui.",
+            tuloste.getvalue()
+        )
+
+    def test_lahteen_muokkaus_paivittaa_tiedot(self):
+        database.add_reference("Vanha otsikko", "Vanha tekijä", 2024)
+        reference_id = database.get_references()[0][0]
+
+        syotteet = [
+            str(reference_id),
+            "1", "Uusi otsikko",
+            "2", "Uusi tekijä",
+            "3", "2025",
+            "5"
+        ]
+
+        with patch("builtins.input", side_effect=syotteet):
+            with redirect_stdout(StringIO()):
+                user_interface.edit_information()
+
+        references = database.get_references()
+        self.assertEqual(
+            references[0][1:],
+            ("Uusi otsikko", "Uusi tekijä", 2025)
+        )
+
+    def test_virheelliset_muokkaustiedot_ei_muuta_lahdetta(self):
+        database.add_reference("Vanha otsikko", "Vanha tekijä", 2024)
+        reference_id = database.get_references()[0][0]
+
+        syotteet = [
+            str(reference_id),
+            "1", "   ",
+            "2", " ",
+            "3", "ei vuosiluku",
+            "5"
+        ]
+
+        with patch("builtins.input", side_effect=syotteet):
+            with redirect_stdout(StringIO()):
+                user_interface.edit_information()
+
+        references = database.get_references()
+        self.assertEqual(
+            references[0][1:],
+            ("Vanha otsikko", "Vanha tekijä", 2024)
+        )
+
+    def test_virheellinen_muokkaus_id_ei_muuta_lahdetta(self):
+        database.add_reference("Otsikko", "Matti Meikäläinen", 2024)
+
+        with patch("builtins.input", return_value="999"):
+            with redirect_stdout(StringIO()):
+                user_interface.edit_information()
+
+        references = database.get_references()
+        self.assertEqual(
+            references[0][1:],
+            ("Otsikko", "Matti Meikäläinen", 2024)
+        )
