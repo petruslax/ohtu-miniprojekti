@@ -140,3 +140,5 @@ class TestLahteidenHallinta(unittest.TestCase):
             tuloste.getvalue()
         )
         self.assertNotIn("Lähde tallennettu!", tuloste.getvalue())
+
+    
