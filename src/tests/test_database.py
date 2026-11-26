@@ -141,4 +141,17 @@ class TestLahteidenHallinta(unittest.TestCase):
         )
         self.assertNotIn("Lähde tallennettu!", tuloste.getvalue())
 
+    def test_bibtex_vienti_tallentaa_lahteen_tiedostoon(self):
+        database.add_reference("Ohjelmistotuotanto", "Matti Meikäläinen", 2024)
+
+        with redirect_stdout(StringIO()):
+            user_interface.export_information()
+
+        bibtex = Path("references.bib").read_text(encoding="utf-8")
+
+        self.assertIn("@misc{lahde1,", bibtex)
+        self.assertIn("author = {Matti Meikäläinen}", bibtex)
+        self.assertIn("title = {Ohjelmistotuotanto}", bibtex)
+        self.assertIn("year = {2024}", bibtex)
+
     
