@@ -60,17 +60,26 @@ def delete_reference(reference_id):
 
 
 def edit_reference(reference_id, title=None, author=None, year=None):
-    """Muokkaa lähteen tietoja käyttäjän antamien tietojen perusteella"""
-    with sqlite3.connect("references.db") as connection:
-        cursor = connection.cursor()
-        cursor.execute(
-        """
-        UPDATE source_references
-            SET title = COALESCE(?, title),
-                author = COALESCE(?, author),
-                year = COALESCE(?, year)
-        WHERE id = ?
-        """,
-        (title, author, year, reference_id)
-        )
-    return cursor.rowcount > 0
+    """Muokkaa lähteen tietoja käyttäjän antamien tietojen perusteella."""
+    connection = sqlite3.connect("references.db")
+
+    try:
+        with connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                UPDATE source_references
+                SET title = COALESCE(?, title),
+                    author = COALESCE(?, author),
+                    year = COALESCE(?, year)
+                WHERE id = ?
+                """,
+                (title, author, year, reference_id)
+            )
+            updated = cursor.rowcount > 0
+
+        return updated
+    finally:
+        connection.close()
+
+        
